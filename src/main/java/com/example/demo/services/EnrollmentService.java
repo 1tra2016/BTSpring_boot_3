@@ -46,7 +46,7 @@ public class EnrollmentService {
         old.setStudentName(enrollment.getStudentName());
         old.setCourseId(enrollment.getCourseId());
 
-        return enrollmentRepository.save(enrollment);
+        return enrollmentRepository.save(old);
     }
     public boolean deleteEnrollmentById(Long id){
         Enrollment  enrollment = enrollmentRepository.findById(id)
