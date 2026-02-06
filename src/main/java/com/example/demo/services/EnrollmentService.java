@@ -21,9 +21,10 @@ public class EnrollmentService {
         if(searchStudentName!=null){
             enrollments = enrollments
                     .stream()
-                    .filter(e -> e.getStudentName().toLowerCase().equals(searchStudentName.toLowerCase()))
+                    .filter(e -> e.getStudentName().toLowerCase().contains(searchStudentName.toLowerCase()))
                     .toList();
         }
+
         return enrollments;
     }
 
@@ -32,23 +33,24 @@ public class EnrollmentService {
 //    }
 
     public Enrollment  getEnrollmentById(Long id){
-        return enrollmentRepository.findById(id).orElse(null);
+        return enrollmentRepository.findById(id)
+                .orElseThrow(() -> new RuntimeException("Course not found id: " + id));
     }
 
     public Enrollment createEnrollment(Enrollment enrollment){
         return enrollmentRepository.save(enrollment);
     }
     public Enrollment updateEnrollment(Long id,Enrollment enrollment){
-        Enrollment old = enrollmentRepository.findById(id).orElse(null);
-        if(old == null)return null;
+        Enrollment old = enrollmentRepository.findById(id)
+                .orElseThrow(() -> new RuntimeException("Course not found id: " + id));
         old.setStudentName(enrollment.getStudentName());
         old.setCourseId(enrollment.getCourseId());
 
         return enrollmentRepository.save(enrollment);
     }
     public boolean deleteEnrollmentById(Long id){
-        Enrollment  enrollment = enrollmentRepository.findById(id).orElse(null);
-        if(enrollment == null)return false;
+        Enrollment  enrollment = enrollmentRepository.findById(id)
+                .orElseThrow(() -> new RuntimeException("Course not found id: " + id));
         enrollmentRepository.delete(enrollment);
         return true;
     }

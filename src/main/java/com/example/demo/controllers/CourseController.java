@@ -29,34 +29,44 @@ public class CourseController {
     @GetMapping("/{id}")
     public ResponseEntity<ApiResponse<Course>> getCourseById(@PathVariable Long id) {
         Course course = courseService.getCourseById(id);
-        if(course == null) return ResponseEntity.notFound().build();
-        else return  ResponseEntity.ok(ApiResponse.success("Thành công", course));
+        try {
+            return ResponseEntity.ok(ApiResponse.success("Thành công", course));
+        }catch(RuntimeException e) {
+            return  ResponseEntity.status(404).body(ApiResponse.error(e.getMessage()));
+        }
     }
 
     @PostMapping
     public ResponseEntity<ApiResponse<Course>> createCourse(@RequestBody Course newCourse) {
         Course course = courseService.createCourse(newCourse);
-
-        if (course == null) return ResponseEntity.badRequest().build();
-        else return ResponseEntity.ok(ApiResponse.success("Thành công", course));
+        try {
+            return ResponseEntity.ok(ApiResponse.success("Thành công", course));
+        }catch(RuntimeException e) {
+            return  ResponseEntity.status(404).body(ApiResponse.error(e.getMessage()));
+        }
     }
 
     @PutMapping("/{id}")
     public ResponseEntity<ApiResponse<Course>> updateCourse(
             @PathVariable long id,
-            @RequestBody Course newCourse) {
-
+            @RequestBody Course newCourse
+    ) {
         Course course = courseService.updateCourse(id, newCourse);
-        if(course ==null) return ResponseEntity.status(HttpStatus.NOT_FOUND)
-                .body(ApiResponse.error("Course not found"));
-        else return ResponseEntity.ok(ApiResponse.success("Thành công", course));
+        try {
+            return ResponseEntity.ok(ApiResponse.success("Thành công", course));
+        }catch(RuntimeException e) {
+            return  ResponseEntity.status(404).body(ApiResponse.error(e.getMessage()));
+        }
 
     }
 
     @DeleteMapping("/{id}")
     public ResponseEntity<ApiResponse<Course>> deleteCourse(@PathVariable long id) {
-        if(courseService.deleteCourse(id)) return ResponseEntity.ok(ApiResponse.success("Xóa thành công",null));
-        else return ResponseEntity.status(HttpStatus.NOT_FOUND)
-                .body(ApiResponse.error("Course not found"));
+        courseService.deleteCourse(id);
+        try {
+            return ResponseEntity.ok(ApiResponse.success("Thành công", null));
+        }catch(RuntimeException e) {
+            return  ResponseEntity.status(404).body(ApiResponse.error(e.getMessage()));
+        }
     }
 }

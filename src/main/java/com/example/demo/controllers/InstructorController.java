@@ -20,35 +20,45 @@ public class InstructorController {
     }
 
     @GetMapping
-    public ResponseEntity<List<Instructor>> getAllInstructor(@RequestParam(required = false) String search) {
+    public ResponseEntity<ApiResponse<List<Instructor>>> getAllInstructor(
+            @RequestParam(required = false) String search
+    ) {
         List<Instructor> instructors = instructorService.getAllInstructor(search);
 
-        return ResponseEntity.ok(instructors);
+        try {
+            return ResponseEntity.ok(ApiResponse.success("Thành công", instructors));
+        }catch(RuntimeException e) {
+            return  ResponseEntity.status(404).body(ApiResponse.error(e.getMessage()));
+        }
     }
 
     @GetMapping("{id}")
-    public ResponseEntity<Instructor> getInstructorById(@PathVariable long id) {
+    public ResponseEntity<ApiResponse<Instructor>> getInstructorById(@PathVariable long id) {
         Instructor instructor = instructorService.getInstructorById(id);
-        if(instructor == null) return ResponseEntity.notFound().build();
-        else return  ResponseEntity.ok(instructor);
+        try {
+            return ResponseEntity.ok(ApiResponse.success("Thành công", instructor));
+        }catch(RuntimeException e) {
+            return  ResponseEntity.status(404).body(ApiResponse.error(e.getMessage()));
+        }
     }
 
     @PutMapping("/{id}")
-    public ResponseEntity<Instructor> updateInstructor(@PathVariable Long id, @RequestBody Instructor newInstructor) {
-        Instructor updatedInstructor = instructorService.updateInstructor(id, newInstructor);
-        if(updatedInstructor == null){
-            return ResponseEntity.notFound().build();
-        }
-        else{
-            return ResponseEntity.ok(updatedInstructor);
+    public ResponseEntity<ApiResponse<Instructor>> updateInstructor(@PathVariable Long id, @RequestBody Instructor newInstructor) {
+        Instructor instructor = instructorService.updateInstructor(id, newInstructor);
+        try {
+            return ResponseEntity.ok(ApiResponse.success("Thành công", instructor));
+        }catch(RuntimeException e) {
+            return  ResponseEntity.status(404).body(ApiResponse.error(e.getMessage()));
         }
     }
     @DeleteMapping("/{id}")
-    public ResponseEntity<Instructor>  deleteInstructorById(@PathVariable Long id) {
-        if(instructorService.deleteInstructorById(id)){
-            return ResponseEntity.ok().build();
-        }else{
-            return ResponseEntity.notFound().build();
+    public ResponseEntity<ApiResponse<Instructor>>  deleteInstructorById(@PathVariable Long id) {
+        instructorService.deleteInstructorById(id);
+        try {
+            return ResponseEntity.ok(ApiResponse.success("Thành công", null));
+        }catch(RuntimeException e) {
+            return  ResponseEntity.status(404).body(ApiResponse.error(e.getMessage()));
         }
+
     }
 }

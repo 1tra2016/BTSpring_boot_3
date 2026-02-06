@@ -18,61 +18,73 @@ public class EnrollmentController {
         this.enrollmentService = enrollmentService;
     }
 
-    // GET /api/enrollments?searchStudentName=abc
     @GetMapping
-    public ResponseEntity<List<Enrollment>> getAllEnrollments(
+    public ResponseEntity<ApiResponse<List<Enrollment>>> getAllEnrollments(
             @RequestParam(required = false) String searchStudentName
     ) {
         List<Enrollment> enrollments =
                 enrollmentService.getAllEnrollments(searchStudentName);
 
-        return ResponseEntity.ok(enrollments);
+        return ResponseEntity.ok(
+                ApiResponse.success("Thành công", enrollments)
+        );
     }
 
-    // GET /api/enrollments/{id}
     @GetMapping("/{id}")
-    public ResponseEntity<Enrollment> getEnrollmentById(@PathVariable long id) {
-        Enrollment enrollment = enrollmentService.getEnrollmentById(id);
-        if (enrollment == null) {
-            return ResponseEntity.notFound().build();
+    public ResponseEntity<ApiResponse<Enrollment>> getEnrollmentById(@PathVariable long id) {
+        try {
+            Enrollment enrollment = enrollmentService.getEnrollmentById(id);
+            return ResponseEntity.ok(
+                    ApiResponse.success("Thành công", enrollment)
+            );
+        } catch (RuntimeException e) {
+            return ResponseEntity.status(HttpStatus.NOT_FOUND)
+                    .body(ApiResponse.error(e.getMessage()));
         }
-        return ResponseEntity.ok(enrollment);
     }
 
-    // POST /api/enrollments
     @PostMapping
-    public ResponseEntity<Enrollment> createEnrollment(
+    public ResponseEntity<ApiResponse<Enrollment>> createEnrollment(
             @RequestBody Enrollment newEnrollment
     ) {
-        Enrollment created = enrollmentService.createEnrollment(newEnrollment);
-        if (created == null) {
-            return ResponseEntity.badRequest().build();
+        try {
+            Enrollment created = enrollmentService.createEnrollment(newEnrollment);
+            return ResponseEntity.status(HttpStatus.CREATED)
+                    .body(ApiResponse.success("Thành công", created));
+        } catch (RuntimeException e) {
+            return ResponseEntity.status(HttpStatus.BAD_REQUEST)
+                    .body(ApiResponse.error(e.getMessage()));
         }
-        return ResponseEntity.status(HttpStatus.CREATED).body(created);
     }
 
-    // PUT /api/enrollments/{id}
     @PutMapping("/{id}")
-    public ResponseEntity<Enrollment> updateEnrollment(
+    public ResponseEntity<ApiResponse<Enrollment>> updateEnrollment(
             @PathVariable long id,
             @RequestBody Enrollment newEnrollment
     ) {
-        Enrollment updated =
-                enrollmentService.updateEnrollment(id, newEnrollment);
+        try {
+            Enrollment updated =
+                    enrollmentService.updateEnrollment(id, newEnrollment);
 
-        if (updated == null) {
-            return ResponseEntity.notFound().build();
+            return ResponseEntity.ok(
+                    ApiResponse.success("Thành công", updated)
+            );
+        } catch (RuntimeException e) {
+            return ResponseEntity.status(HttpStatus.NOT_FOUND)
+                    .body(ApiResponse.error(e.getMessage()));
         }
-        return ResponseEntity.ok(updated);
     }
 
-    // DELETE /api/enrollments/{id}
     @DeleteMapping("/{id}")
-    public ResponseEntity<Void> deleteEnrollment(@PathVariable long id) {
-        boolean deleted = enrollmentService.deleteEnrollmentById(id);
-        if (!deleted) {
-            return ResponseEntity.notFound().build();
+    public ResponseEntity<ApiResponse<Void>> deleteEnrollment(@PathVariable long id) {
+        try {
+            enrollmentService.deleteEnrollmentById(id);
+            return ResponseEntity.ok(
+                    ApiResponse.success("Thành công", null)
+            );
+        } catch (RuntimeException e) {
+            return ResponseEntity.status(HttpStatus.NOT_FOUND)
+                    .body(ApiResponse.error(e.getMessage()));
         }
-        return ResponseEntity.noContent().build();
     }
 }

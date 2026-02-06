@@ -26,21 +26,24 @@ public class InstructorService {
         }
         return instructors;
     }
-    public Instructor getInstructorById(Long id){return instructorRepository.findById(id).orElse(null);}
+    public Instructor getInstructorById(Long id){
+        return instructorRepository.findById(id)
+                .orElseThrow(() -> new RuntimeException("Course not found id: " + id));
+    }
 //    public Instructor findInstructorById(Long id){
 //        return instructorRepository.findById(id).orElse(null);
 //    }
     public Instructor updateInstructor(Long id, Instructor newInstructor) {
-        Instructor old = instructorRepository.findById(id).orElse(null);
-        if(old == null) return null;
+        Instructor old = instructorRepository.findById(id)
+                .orElseThrow(() -> new RuntimeException("Course not found id: " + id));
         old.setInstructorname(newInstructor.getInstructorname());
         old.setEmail(newInstructor.getEmail());
         instructorRepository.save(old);
         return old;
     }
     public boolean deleteInstructorById(Long id){
-        Instructor instructor  = instructorRepository.findById(id).orElse(null);
-        if(instructor == null) return false;
+        Instructor instructor  = instructorRepository.findById(id)
+                .orElseThrow(() -> new RuntimeException("Course not found id: " + id));
         instructorRepository.delete(instructor);
         return true;
     }

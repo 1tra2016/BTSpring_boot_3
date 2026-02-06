@@ -7,6 +7,7 @@ import com.example.demo.repositories.CourseRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 
 import java.util.List;
+import java.util.NoSuchElementException;
 
 @org.springframework.stereotype.Service
 public class CourseService {
@@ -35,8 +36,9 @@ public class CourseService {
     //    return courseRepository.findById(id).orElse(null);
     //}
 
-    public Course  getCourseById(Long id) {
-        Course course = courseRepository.findById(id).orElse(null);
+    public Course getCourseById(Long id) {
+        Course course = courseRepository.findById(id)
+                .orElseThrow(() -> new RuntimeException("Course not found id: " + id));
         return course;
     }
 
@@ -45,19 +47,19 @@ public class CourseService {
     }
 
     public Course updateCourse(Long id, Course newCourse) {
-        Course old = courseRepository.findById(id).orElse(null);
-        if (old == null) return null;
+        Course existing = courseRepository.findById(id)
+                .orElseThrow(() -> new RuntimeException("Course not found id: " + id));
 
-        old.setTitle(newCourse.getTitle());
-        old.setStatus(newCourse.getStatus());
-        old.setInstructorId(newCourse.getInstructorId());
+        existing.setTitle(newCourse.getTitle());
+        existing.setStatus(newCourse.getStatus());
+        existing.setInstructorId(newCourse.getInstructorId());
 
-        return courseRepository.save(old);
+        return courseRepository.save(existing);
     }
 
     public boolean deleteCourse(Long id){
-        Course course = courseRepository.findById(id).orElse(null);
-        if (course == null) return false;
+        Course course = courseRepository.findById(id)
+                .orElseThrow(() -> new RuntimeException("Course not found id: " + id));
         courseRepository.deleteById(id);
         return true;
     }
