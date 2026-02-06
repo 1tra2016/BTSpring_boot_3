@@ -21,55 +21,42 @@ public class CourseController {
     }
 
     @GetMapping
-    public ResponseEntity<List<Course>> getAllCourses(@RequestParam(required = false) String search) {
-        List<Course> courses = courseService.getAllCourses();
-        if (search != null && !search.isEmpty()) {
-            courses = courses.stream()
-                    .filter(u -> u.getTitle().toLowerCase().contains(search.toLowerCase()))
-                    .toList();
-        }
-        return ResponseEntity.ok(courses);
+    public ResponseEntity<ApiResponse<List<Course>>> getAllCourses(@RequestParam(required = false) String search) {
+        List<Course> courses = courseService.getAllCourses(search);
+        return ResponseEntity.ok(ApiResponse.success("Thành công", courses));
     }
 
     @GetMapping("/{id}")
-    public ResponseEntity<Course> getCourseById(@PathVariable Long id) {
+    public ResponseEntity<ApiResponse<Course>> getCourseById(@PathVariable Long id) {
         Course course = courseService.getCourseById(id);
         if(course == null) return ResponseEntity.notFound().build();
-        else return  ResponseEntity.ok(course);
+        else return  ResponseEntity.ok(ApiResponse.success("Thành công", course));
     }
 
     @PostMapping
-    public ResponseEntity<Course> createCourse(@RequestBody Course newCourse) {
-        Course createdCourse = courseService.createCourse(newCourse);
+    public ResponseEntity<ApiResponse<Course>> createCourse(@RequestBody Course newCourse) {
+        Course course = courseService.createCourse(newCourse);
 
-        if (createdCourse == null) {
-            return ResponseEntity.badRequest().build();
-        }
-        else{
-            return ResponseEntity.status(HttpStatus.CREATED)
-                .body(createdCourse);
-        }
+        if (course == null) return ResponseEntity.badRequest().build();
+        else return ResponseEntity.ok(ApiResponse.success("Thành công", course));
     }
 
     @PutMapping("/{id}")
-    public ResponseEntity<Course> updateCourse(
+    public ResponseEntity<ApiResponse<Course>> updateCourse(
             @PathVariable long id,
             @RequestBody Course newCourse) {
 
         Course course = courseService.updateCourse(id, newCourse);
-        if(course ==null){
-            return ResponseEntity.badRequest().build();
-        }
-        else{
-            return ResponseEntity.ok(course);
-        }
+        if(course ==null) return ResponseEntity.status(HttpStatus.NOT_FOUND)
+                .body(ApiResponse.error("Course not found"));
+        else return ResponseEntity.ok(ApiResponse.success("Thành công", course));
+
     }
 
     @DeleteMapping("/{id}")
-    public ResponseEntity<Course> deleteCourse(@PathVariable long id) {
-        if(courseService.deleteCourse(id)) {
-            return ResponseEntity.ok().build();
-        }
-        return ResponseEntity.badRequest().build();
+    public ResponseEntity<ApiResponse<Course>> deleteCourse(@PathVariable long id) {
+        if(courseService.deleteCourse(id)) return ResponseEntity.ok(ApiResponse.success("Xóa thành công",null));
+        else return ResponseEntity.status(HttpStatus.NOT_FOUND)
+                .body(ApiResponse.error("Course not found"));
     }
 }

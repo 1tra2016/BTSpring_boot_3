@@ -16,8 +16,15 @@ public class InstructorService {
         this.instructorRepository = instructorRepository;
     }
 
-    public List<Instructor> getAllInstructor() {
-        return instructorRepository.findAll();
+    public List<Instructor> getAllInstructor(String search) {
+        List<Instructor> instructors = instructorRepository.findAll();
+        if (search != null && !search.isEmpty()) {
+            instructors = instructors
+                    .stream()
+                    .filter(u -> u.getInstructorname().toLowerCase().contains(search.toLowerCase()))
+                    .toList();
+        }
+        return instructors;
     }
     public Instructor getInstructorById(Long id){return instructorRepository.findById(id).orElse(null);}
 //    public Instructor findInstructorById(Long id){

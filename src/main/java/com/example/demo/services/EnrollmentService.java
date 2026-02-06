@@ -16,8 +16,15 @@ public class EnrollmentService {
         this.enrollmentRepository = enrollmentRepository;
     }
 
-    public List<Enrollment> getAllEnrollments(){
-        return enrollmentRepository.findAll();
+    public List<Enrollment> getAllEnrollments(String searchStudentName){
+        List<Enrollment> enrollments = enrollmentRepository.findAll();
+        if(searchStudentName!=null){
+            enrollments = enrollments
+                    .stream()
+                    .filter(e -> e.getStudentName().toLowerCase().equals(searchStudentName.toLowerCase()))
+                    .toList();
+        }
+        return enrollments;
     }
 
 //    public Enrollment findById(Long id){

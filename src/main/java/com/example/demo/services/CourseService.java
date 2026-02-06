@@ -20,8 +20,15 @@ public class CourseService {
         this.instructorService = instructorService;
     }
 
-    public List<Course> getAllCourses() {
-        return courseRepository.findAll();
+    public List<Course> getAllCourses(String search) {
+        List<Course> courses = courseRepository.findAll();
+        if (search != null) {
+            courses = courses
+                    .stream()
+                    .filter(u -> u.getTitle().toLowerCase().contains(search.toLowerCase()))
+                    .toList();
+        }
+        return courses;
     }
 
     //public Course findById(Long id){

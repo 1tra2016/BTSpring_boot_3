@@ -21,12 +21,8 @@ public class InstructorController {
 
     @GetMapping
     public ResponseEntity<List<Instructor>> getAllInstructor(@RequestParam(required = false) String search) {
-        List<Instructor> instructors = instructorService.getAllInstructor();
-        if (search != null && !search.isEmpty()) {
-            instructors = instructors.stream()
-                    .filter(u -> u.getInstructorname().toLowerCase().contains(search.toLowerCase()))
-                    .toList();
-        }
+        List<Instructor> instructors = instructorService.getAllInstructor(search);
+
         return ResponseEntity.ok(instructors);
     }
 
